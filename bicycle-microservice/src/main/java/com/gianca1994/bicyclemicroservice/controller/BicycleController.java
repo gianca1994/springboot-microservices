@@ -1,5 +1,6 @@
 package com.gianca1994.bicyclemicroservice.controller;
 
+import com.gianca1994.bicyclemicroservice.dto.BicycleDTO;
 import com.gianca1994.bicyclemicroservice.model.Bicycle;
 import com.gianca1994.bicyclemicroservice.service.BicycleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,28 @@ public class BicycleController {
     private BicycleService bicycleService;
 
     @GetMapping
-    public List<Bicycle> getAllBicycles() {
-        return bicycleService.getAllBicycles();
+    public List<Bicycle> getAll() {
+        return bicycleService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Bicycle getById(@PathVariable String id) {
+        return bicycleService.getById(id);
     }
 
     @PostMapping
-    public void save(@RequestBody Bicycle bicycle) {
+    public void save(@RequestBody BicycleDTO bicycle) {
         bicycleService.save(bicycle);
     }
+
+    @PutMapping("/{id}")
+    public void update(@PathVariable String id, @RequestBody BicycleDTO bicycle) {
+        bicycleService.update(id, bicycle);
+    }
+    
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        bicycleService.delete(id);
+    }
+
 }
