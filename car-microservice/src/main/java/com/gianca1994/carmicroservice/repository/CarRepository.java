@@ -1,4 +1,4 @@
-package com.gianca1994.carmicroservice.Repository;
+package com.gianca1994.carmicroservice.repository;
 
 import com.gianca1994.carmicroservice.model.Car;
 import org.springframework.data.mongodb.repository.MongoRepository;
