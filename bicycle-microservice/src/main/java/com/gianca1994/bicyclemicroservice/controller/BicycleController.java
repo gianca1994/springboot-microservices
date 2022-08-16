@@ -31,10 +31,10 @@ public class BicycleController {
     }
 
     @PutMapping("/{id}")
-    public void update(@PathVariable String id, @RequestBody Bicycle bicycle) {
+    public void update(@PathVariable String id, @RequestBody BicycleDTO bicycle) {
         bicycleService.update(id, bicycle);
     }
-
+    
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
         bicycleService.delete(id);
