@@ -1,6 +1,8 @@
 package com.gianca1994.carmicroservice.service;
 
 import com.gianca1994.carmicroservice.dto.CarDTO;
+import com.gianca1994.carmicroservice.exception.BadRequest;
+import com.gianca1994.carmicroservice.exception.NotFound;
 import com.gianca1994.carmicroservice.repository.CarRepository;
 import com.gianca1994.carmicroservice.model.Car;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +22,13 @@ public class CarService {
     }
 
     public Car getCarById(String id) {
+        if (Objects.isNull(id)) throw new NotFound("Id cannot be null");
         return carRepository.findById(id).orElse(null);
     }
 
     public void saveCar(CarDTO car) {
+        checkCarObject(car);
+
         Car carSearch = carRepository.findByBrandAndModelAndYearAndColor(
                 car.getBrand(), car.getModel(), car.getYear(), car.getColor());
 
@@ -43,9 +48,12 @@ public class CarService {
     }
 
     public Car updateCar(String id, CarDTO car) {
+        if (Objects.isNull(id)) throw new NotFound("Id cannot be null");
+        checkCarObject(car);
+
         Car carUpdate = carRepository.findById(id).orElse(null);
 
-        if (carUpdate == null) return null;
+        if (carUpdate == null) throw new NotFound("Car not found");
 
         carUpdate.setBrand(car.getBrand());
         carUpdate.setModel(car.getModel());
@@ -55,7 +63,21 @@ public class CarService {
         return carRepository.save(carUpdate);
     }
 
+    private void checkCarObject(CarDTO car) {
+        if (car.getBrand().isEmpty()) throw new BadRequest("Brand cannot be empty");
+        if (car.getModel().isEmpty()) throw new BadRequest("Model cannot be empty");
+        if (car.getYear().isEmpty()) throw new BadRequest("Year cannot be empty");
+        if (car.getColor().isEmpty()) throw new BadRequest("Color cannot be empty");
+        if (car.getPrice().isNaN()) throw new BadRequest("Price cannot be empty");
+        if (car.getPrice() < 0) throw new BadRequest("Price cannot be less than 0");
+    }
+
     public void deleteCar(String id) {
+        if (Objects.isNull(id)) throw new NotFound("Id cannot be null");
+
+        Car carDelete = carRepository.findById(id).orElse(null);
+        if (carDelete == null) throw new NotFound("Car not found");
+
         carRepository.deleteById(id);
     }
 }
