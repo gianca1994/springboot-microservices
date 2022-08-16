@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "cars")
+@Document(value = "car")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,5 +17,5 @@ public class Car {
     private String model;
     private String year;
     private String color;
-    private String price;
+    private Double price;
 }
