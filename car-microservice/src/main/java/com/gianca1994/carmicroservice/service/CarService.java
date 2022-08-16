@@ -22,8 +22,7 @@ public class CarService {
     }
 
     public Car getCarById(String id) {
-        if (Objects.isNull(id)) throw new NotFound("Id cannot be null");
-        return carRepository.findById(id).orElse(null);
+        return carRepository.findById(id).orElseThrow(() -> new NotFound("Car not found"));
     }
 
     public void saveCar(CarDTO car) {
@@ -35,6 +34,7 @@ public class CarService {
         if (carSearch != null) {
             carSearch.setAmount(carSearch.getAmount() + 1);
             carRepository.save(carSearch);
+            return;
         }
 
         carRepository.save(new Car(
