@@ -21,7 +21,6 @@ public class Bicycle {
     private String color;
     private Double price;
     private int amount;
-
     public Bicycle(String brand, String model, int frameSize, String type, String year, String color, Double price, int amount) {
         this.brand = brand;
         this.model = model;
