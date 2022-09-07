@@ -1,0 +1,16 @@
+# RabbitMQ
+RABBITMQ_HOST={rabbitmq-SERVICE-NAME}
+RABBITMQ_PORT=5672
+RABBITMQ_USER={rabbitmq-username}
+RABBITMQ_PASSWORD={rabbitmq-password}
+
+# Eureka
+EUREKA_URL=http://{discovery-SERVICE-NAME}:8761/eureka
+EUREKA_PREFER_IP_ADDRESS=true
+
+# Cloud Config
+CONFIG_URL=http://{config-SERVICE-NAME}:8888
+CONFIG_FAIL_FAST=true
+CONFIG_RETRY_MAX_ATTEMPTS=20
+CONFIG_EXPOSURE_INCLUDE=*
+CONFIG_PROFILE={config-profile-name}
