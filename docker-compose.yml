@@ -7,26 +7,32 @@ services:
         ports:
             - "5672:5672"
             - "15672:15672"
+        networks:
+            - red
 
     discovery-service:
         image: discovery-service:latest
         container_name: discovery-service
-        depends_on:
-            - mongo
         ports:
             - "8761:8761"
-        #environment:
-        #    - eureka.client.register-with-eureka=false
-        #    - eureka.client.fetch-registry=false
+        networks:
+            - red
 
     config-service:
         image: config-service:latest
         container_name: config-service
         ports:
             - "8888:8888"
-        #environment:
-        #    - spring.cloud.config.server.git.uri=https://github.com/gianca1994/springboot-microservices-config
-        #    - spring.cloud.config.server.git.clone-on-start=true
+        networks:
+            - red
+
+    mongo:
+        image: mongo:latest
+        container_name: mongo
+        volumes:
+            - ./data/db:/data/db
+        networks:
+            - red
 
     car-service:
         image: car-service:latest
@@ -36,13 +42,22 @@ services:
             - discovery-service
             - rabbitmq
             - mongo
-        #environment:
-        #    - spring.cloud.config.uri=http://config-service:8888
-        #    - management.endpoints.web.exposure.include=*
-        #    - spring.cloud.config.profile=dev
+        environment:
+            - 'spring.rabbitmq.host=${RABBITMQ_HOST}'
+            - 'spring.rabbitmq.port=${RABBITMQ_PORT}'
+            - 'spring.rabbitmq.username=${RABBITMQ_USERNAME}'
+            - 'spring.rabbitmq.password=${RABBITMQ_PASSWORD}'
 
-    mongo:
-        image: mongo:latest
-        container_name: mongo
-        volumes:
-            - ./data/db:/data/db
+            - 'eureka.client.serviceUrl.defaultZone=${EUREKA_URL}'
+            - 'eureka.instance.preferIpAddress=${EUREKA_PREFER_IP_ADDRESS}'
+
+            - 'spring.cloud.config.uri=${CONFIG_URL}'
+            - 'spring.cloud.config.fail-fast=${CONFIG_FAIL_FAST}'
+            - 'spring.cloud.config.retry.maxAttempts=${CONFIG_RETRY_MAX_ATTEMPTS}'
+            - 'management.endpoints.web.exposure.include=${CONFIG_EXPOSURE_INCLUDE}'
+            - 'spring.cloud.config.profile=${CONFIG_PROFILE}'
+        networks:
+            - red
+
+networks:
+    red:
