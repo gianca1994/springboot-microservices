@@ -26,11 +26,27 @@ services:
         networks:
             - red
 
-    mongo:
-        image: mongo:latest
-        container_name: mongo
-        volumes:
-            - ./data/db:/data/db
+    api-gateway:
+        image: api-gateway:latest
+        container_name: api-gateway
+        ports:
+            - "8080:8080"
+        depends_on:
+            - rabbitmq
+            - discovery-service
+            - config-service
+            - car-service
+        environment:
+            - 'spring.application.name=${API_GATEWAY_SERVICE_NAME}'
+            - 'spring.cloud.gateway.discovery.locator.enabled=${GATEWAY_DISCOVERY_ENABLED}'
+            - 'eureka.client.serviceUrl.defaultZone=${EUREKA_URL}'
+            - 'spring.cloud.loadbalancer.ribbon.enabled=${GATEWAY_LOADBALANCER_ENABLED}'
+            - 'spring.cloud.gateway.routes[0].id=${GATEWAY_ROUTE_1_ID}'
+            - 'spring.cloud.gateway.routes[0].uri=${GATEWAY_ROUTE_1_URI}'
+            - 'spring.cloud.gateway.routes[0].predicates[0]=${GATEWAY_ROUTE_1_PREDICATE}'
+            - 'spring.cloud.gateway.routes[1].id=${GATEWAY_ROUTE_2_ID}'
+            - 'spring.cloud.gateway.routes[1].uri=${GATEWAY_ROUTE_2_URI}'
+            - 'spring.cloud.gateway.routes[1].predicates[0]=${GATEWAY_ROUTE_2_PREDICATE}'
         networks:
             - red
 
@@ -43,6 +59,7 @@ services:
             - rabbitmq
             - mongo
         environment:
+            - 'spring.application.name=${CAR_SERVICE_NAME}'
             - 'spring.rabbitmq.host=${RABBITMQ_HOST}'
             - 'spring.rabbitmq.port=${RABBITMQ_PORT}'
             - 'spring.rabbitmq.username=${RABBITMQ_USERNAME}'
@@ -56,6 +73,40 @@ services:
             - 'spring.cloud.config.retry.maxAttempts=${CONFIG_RETRY_MAX_ATTEMPTS}'
             - 'management.endpoints.web.exposure.include=${CONFIG_EXPOSURE_INCLUDE}'
             - 'spring.cloud.config.profile=${CONFIG_PROFILE}'
+        networks:
+            - red
+
+    bicycle-service:
+        image: bicycle-service:latest
+        container_name: bicycle-service
+        depends_on:
+            - config-service
+            - discovery-service
+            - rabbitmq
+            - mongo
+        environment:
+            - 'spring.application.name=${BICYCLE_SERVICE_NAME}'
+            - 'spring.rabbitmq.host=${RABBITMQ_HOST}'
+            - 'spring.rabbitmq.port=${RABBITMQ_PORT}'
+            - 'spring.rabbitmq.username=${RABBITMQ_USERNAME}'
+            - 'spring.rabbitmq.password=${RABBITMQ_PASSWORD}'
+
+            - 'eureka.client.serviceUrl.defaultZone=${EUREKA_URL}'
+            - 'eureka.instance.preferIpAddress=${EUREKA_PREFER_IP_ADDRESS}'
+
+            - 'spring.cloud.config.uri=${CONFIG_URL}'
+            - 'spring.cloud.config.fail-fast=${CONFIG_FAIL_FAST}'
+            - 'spring.cloud.config.retry.maxAttempts=${CONFIG_RETRY_MAX_ATTEMPTS}'
+            - 'management.endpoints.web.exposure.include=${CONFIG_EXPOSURE_INCLUDE}'
+            - 'spring.cloud.config.profile=${CONFIG_PROFILE}'
+        networks:
+            - red
+
+    mongo:
+        image: mongo:latest
+        container_name: mongo
+        volumes:
+            - ./data/db:/data/db
         networks:
             - red
 
